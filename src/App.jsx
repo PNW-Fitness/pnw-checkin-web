@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import CheckinPage from './pages/CheckinPage'
+import DisplayPage from './pages/DisplayPage'
 
 function NotFound() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/checkin" element={<CheckinPage />} />
+        <Route path="/display" element={<DisplayPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
