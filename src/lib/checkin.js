@@ -38,6 +38,49 @@ export async function submitClassPassCheckin({ token, formData, waiverAgreedAt, 
   if (error) throw error
 }
 
+// Searches past ClassPass check-ins by guest name or contact.
+// Returns unique guests (grouped by contact), most recent visit first.
+export async function lookupClassPassGuest(term) {
+  const like = `%${term.trim()}%`
+  const { data, error } = await supabase
+    .from('pending_checkins')
+    .select('form_data, waiver_agreed_at')
+    .eq('flow_type', 'classpass')
+    .or(`form_data->>guest_name.ilike.${like},form_data->>contact.ilike.${like}`)
+    .order('waiver_agreed_at', { ascending: false })
+    .limit(100)
+  if (error) throw error
+
+  // Group by contact client-side to get unique guests + visit counts
+  const map = new Map()
+  for (const row of data ?? []) {
+    const key = (row.form_data?.contact || '').toLowerCase()
+    if (!map.has(key)) {
+      map.set(key, {
+        guestName: row.form_data?.guest_name || '',
+        contact:   row.form_data?.contact   || '',
+        zipCode:   row.form_data?.zip_code  || '',
+        lastVisit: row.waiver_agreed_at,
+        visitCount: 1,
+      })
+    } else {
+      map.get(key).visitCount++
+    }
+  }
+  return Array.from(map.values()).slice(0, 10)
+}
+
+export async function submitClassPassReturning({ token, formData }) {
+  const { error } = await supabase.from('pending_checkins').insert({
+    flow_type: 'classpass',
+    session_token: token,
+    form_data: { ...formData, is_returning: true },
+    waiver_agreed_at: new Date().toISOString(),
+    signature_data: null,
+  })
+  if (error) throw error
+}
+
 export async function submitVendorCheckin({ token, name, company, reason }) {
   const { error } = await supabase.from('vendor_submissions').insert({
     session_token: token,
