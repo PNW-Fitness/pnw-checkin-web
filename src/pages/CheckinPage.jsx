@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { validateCheckinToken, submitGuestCheckin, submitClassPassCheckin, submitClassPassReturning, submitVendorCheckin } from '../lib/checkin'
+import { validateCheckinToken, submitGuestCheckin, submitClassPassCheckin, submitClassPassReturning, submitTanningCheckin, submitVendorCheckin } from '../lib/checkin'
 import TokenInvalid from './TokenInvalid'
 import FlowSelector from './FlowSelector'
 import AgeCheck from './guest/AgeCheck'
@@ -14,9 +14,13 @@ import ClassPassForm from './classpass/ClassPassForm'
 import ClassPassConfirmation from './classpass/ClassPassConfirmation'
 import VendorForm from './vendor/VendorForm'
 import VendorConfirmation from './vendor/VendorConfirmation'
+import TanningAgeCheck from './tanning/TanningAgeCheck'
+import TanningForm from './tanning/TanningForm'
+import TanningConfirmation from './tanning/TanningConfirmation'
 import WaiverStep from '../components/WaiverStep'
 import { WAIVER_TEXT } from '../lib/waiverText'
 import { CLASSPASS_WAIVER_TEXT } from '../lib/classpassWaiverText'
+import { TANNING_WAIVER_TEXT } from '../lib/tanningWaiverText'
 
 const EMPTY_GUEST_SESSION = {
   isMinor: false,
@@ -50,6 +54,10 @@ export default function CheckinPage() {
   const [cpReturning, setCpReturning] = useState(false)
   const [cpSubmitting, setCpSubmitting] = useState(false)
   const [cpSubmitError, setCpSubmitError] = useState('')
+
+  const [tanningSession, setTanningSession] = useState({ fullName: '', contact: '', zipCode: '' })
+  const [tanningSubmitting, setTanningSubmitting] = useState(false)
+  const [tanningSubmitError, setTanningSubmitError] = useState('')
 
   const [vendorSubmitting, setVendorSubmitting] = useState(false)
   const [vendorSubmitError, setVendorSubmitError] = useState('')
@@ -163,10 +171,34 @@ export default function CheckinPage() {
     }
   }
 
+  async function handleTanningWaiverSubmit({ signatureDataUrl, waiverAgreedAt }) {
+    setTanningSubmitError('')
+    setTanningSubmitting(true)
+    try {
+      await submitTanningCheckin({
+        token,
+        formData: {
+          full_name: tanningSession.fullName,
+          contact: tanningSession.contact,
+          zip_code: tanningSession.zipCode,
+        },
+        waiverAgreedAt,
+        signatureDataUrl,
+      })
+      setStep('tanning_confirm')
+    } catch (err) {
+      console.error('Tanning check-in failed:', err)
+      setTanningSubmitError('Something went wrong submitting your form. Please try again or see front desk staff.')
+    } finally {
+      setTanningSubmitting(false)
+    }
+  }
+
   function resetToSelector() {
     setGuestSession(EMPTY_GUEST_SESSION)
     setCpSession(EMPTY_CP_SESSION)
     setCpReturning(false)
+    setTanningSession({ fullName: '', contact: '', zipCode: '' })
     setStep('selector')
   }
 
@@ -179,6 +211,7 @@ export default function CheckinPage() {
         <FlowSelector
           onGuest={() => setStep('guest_age_check')}
           onClassPass={() => setStep('classpass_notice')}
+          onTanning={() => setStep('tanning_age_check')}
           onVendor={() => setStep('vendor_form')}
         />
       )
@@ -272,6 +305,36 @@ export default function CheckinPage() {
     case 'classpass_confirm':
       return <ClassPassConfirmation cpSession={cpSession} onDone={resetToSelector} isReturning={cpReturning} />
 
+    // ── Tanning flow ──────────────────────────────────────────────────────
+    case 'tanning_age_check':
+      return <TanningAgeCheck onConfirm={() => setStep('tanning_form')} onBack={resetToSelector} />
+
+    case 'tanning_form':
+      return (
+        <TanningForm
+          onSubmit={(data) => { setTanningSession(data); setStep('tanning_waiver') }}
+          onBack={() => setStep('tanning_age_check')}
+        />
+      )
+
+    case 'tanning_waiver':
+      return (
+        <WaiverStep
+          heading="Tanning Release and Consent Form"
+          intro="Please read this form carefully before signing."
+          waiverText={TANNING_WAIVER_TEXT}
+          signerLabel={`Signature — ${tanningSession.fullName}`}
+          submitLabel="Submit Consent Form"
+          onBack={() => setStep('tanning_form')}
+          onSubmit={handleTanningWaiverSubmit}
+          submitError={tanningSubmitError}
+          submitting={tanningSubmitting}
+        />
+      )
+
+    case 'tanning_confirm':
+      return <TanningConfirmation tanningSession={tanningSession} onDone={resetToSelector} />
+
     // ── Vendor flow ───────────────────────────────────────────────────────
     case 'vendor_form':
       return (
@@ -291,6 +354,7 @@ export default function CheckinPage() {
         <FlowSelector
           onGuest={() => setStep('guest_age_check')}
           onClassPass={() => setStep('classpass_notice')}
+          onTanning={() => setStep('tanning_age_check')}
           onVendor={() => setStep('vendor_form')}
         />
       )

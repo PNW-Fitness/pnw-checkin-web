@@ -1,4 +1,4 @@
-export default function FlowSelector({ onGuest, onClassPass, onVendor }) {
+export default function FlowSelector({ onGuest, onClassPass, onTanning, onVendor }) {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-10 bg-primary px-6 py-10 text-center text-white">
       <div>
@@ -18,6 +18,12 @@ export default function FlowSelector({ onGuest, onClassPass, onVendor }) {
           onClick={onClassPass}
         >
           📱 ClassPass
+        </button>
+        <button
+          className="flex items-center justify-center gap-3 rounded-2xl bg-amber-500 py-6 text-xl font-bold text-white shadow-lg"
+          onClick={onTanning}
+        >
+          ☀️ Tanning
         </button>
         <button
           className="flex items-center justify-center gap-3 rounded-2xl border-2 border-white/30 bg-white/15 py-6 text-xl font-bold text-white shadow-lg"

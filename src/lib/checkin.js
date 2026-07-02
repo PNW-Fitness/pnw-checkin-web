@@ -81,6 +81,17 @@ export async function submitClassPassReturning({ token, formData }) {
   if (error) throw error
 }
 
+export async function submitTanningCheckin({ token, formData, waiverAgreedAt, signatureDataUrl }) {
+  const { error } = await supabase.from('pending_checkins').insert({
+    flow_type: 'tanning',
+    session_token: token,
+    form_data: formData,
+    waiver_agreed_at: waiverAgreedAt,
+    signature_data: signatureDataUrl,
+  })
+  if (error) throw error
+}
+
 export async function submitVendorCheckin({ token, name, company, reason }) {
   const { error } = await supabase.from('vendor_submissions').insert({
     session_token: token,
