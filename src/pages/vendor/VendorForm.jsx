@@ -1,11 +1,12 @@
 import { useState } from 'react'
 
-const EMPTY = { name: '', company: '', reason: '' }
+const EMPTY = { name: '', company: '', phone: '', reason: '' }
 
 function validate(form) {
   const errors = {}
   if (!form.name.trim()) errors.name = 'Required'
   if (!form.company.trim()) errors.company = 'Required'
+  if (!form.phone.trim()) errors.phone = 'Required'
   if (!form.reason.trim()) errors.reason = 'Required'
   return errors
 }
@@ -50,6 +51,12 @@ export default function VendorForm({ onSubmit, onBack, submitting, submitError }
             <label className="text-sm font-semibold text-gray-700">Company *</label>
             <input className="min-h-[48px] w-full rounded-lg border border-gray-300 px-3" type="text" autoComplete="off" value={form.company} onChange={(e) => set('company', e.target.value)} />
             {errors.company && <p className="text-sm text-red-600">{errors.company}</p>}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-gray-700">Phone *</label>
+            <input className="min-h-[48px] w-full rounded-lg border border-gray-300 px-3" type="tel" autoComplete="off" value={form.phone} onChange={(e) => set('phone', e.target.value)} />
+            {errors.phone && <p className="text-sm text-red-600">{errors.phone}</p>}
           </div>
 
           <div className="flex flex-col gap-1.5">

@@ -92,12 +92,12 @@ export async function submitTanningCheckin({ token, formData, waiverAgreedAt, si
   if (error) throw error
 }
 
-export async function submitVendorCheckin({ token, name, company, reason }) {
-  const { error } = await supabase.from('vendor_submissions').insert({
-    session_token: token,
-    name,
-    company,
-    reason,
+export async function submitVendorCheckin({ name, company, phone, reason }) {
+  const { error } = await supabase.rpc('insert_vendor_submission', {
+    p_name: name,
+    p_company: company,
+    p_phone: phone,
+    p_reason: reason,
   })
   if (error) throw error
 }

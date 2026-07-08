@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { validateCheckinToken, submitGuestCheckin, submitClassPassCheckin, submitClassPassReturning, submitTanningCheckin, submitVendorCheckin } from '../lib/checkin'
+import { validateCheckinToken, submitGuestCheckin, submitClassPassCheckin, submitTanningCheckin, submitVendorCheckin } from '../lib/checkin'
 import TokenInvalid from './TokenInvalid'
 import FlowSelector from './FlowSelector'
 import AgeCheck from './guest/AgeCheck'
@@ -9,7 +9,6 @@ import GuestForm from './guest/GuestForm'
 import GuestConfirmation from './guest/GuestConfirmation'
 import ClassPassNotice from './classpass/ClassPassNotice'
 import ClassPassNewOrReturn from './classpass/ClassPassNewOrReturn'
-import ClassPassReturnLookup from './classpass/ClassPassReturnLookup'
 import ClassPassForm from './classpass/ClassPassForm'
 import ClassPassConfirmation from './classpass/ClassPassConfirmation'
 import VendorForm from './vendor/VendorForm'
@@ -51,7 +50,6 @@ export default function CheckinPage() {
   const [guestSubmitError, setGuestSubmitError] = useState('')
 
   const [cpSession, setCpSession] = useState(EMPTY_CP_SESSION)
-  const [cpReturning, setCpReturning] = useState(false)
   const [cpSubmitting, setCpSubmitting] = useState(false)
   const [cpSubmitError, setCpSubmitError] = useState('')
 
@@ -111,29 +109,6 @@ export default function CheckinPage() {
     setStep(nextStep)
   }
 
-  async function handleSubmitClassPassReturning(guest) {
-    setCpSubmitError('')
-    setCpSubmitting(true)
-    try {
-      await submitClassPassReturning({
-        token,
-        formData: {
-          guest_name: guest.guestName,
-          contact: guest.contact,
-          zip_code: guest.zipCode,
-        },
-      })
-      setCpSession(guest)
-      setCpReturning(true)
-      setStep('classpass_confirm')
-    } catch (err) {
-      console.error('ClassPass returning check-in failed:', err)
-      setCpSubmitError('Something went wrong submitting your check-in. Please try again or see front desk staff.')
-    } finally {
-      setCpSubmitting(false)
-    }
-  }
-
   async function handleCpWaiverSubmit({ signatureDataUrl, waiverAgreedAt }) {
     setCpSubmitError('')
     setCpSubmitting(true)
@@ -161,7 +136,7 @@ export default function CheckinPage() {
     setVendorSubmitError('')
     setVendorSubmitting(true)
     try {
-      await submitVendorCheckin({ token, ...vendorForm })
+      await submitVendorCheckin(vendorForm)
       setStep('vendor_confirm')
     } catch (err) {
       console.error('Vendor sign-in failed:', err)
@@ -197,7 +172,6 @@ export default function CheckinPage() {
   function resetToSelector() {
     setGuestSession(EMPTY_GUEST_SESSION)
     setCpSession(EMPTY_CP_SESSION)
-    setCpReturning(false)
     setTanningSession({ fullName: '', contact: '', zipCode: '' })
     setStep('selector')
   }
@@ -266,16 +240,7 @@ export default function CheckinPage() {
       return (
         <ClassPassNewOrReturn
           onNew={() => setStep('classpass_form')}
-          onReturning={() => setStep('classpass_return_lookup')}
           onBack={() => setStep('classpass_notice')}
-        />
-      )
-
-    case 'classpass_return_lookup':
-      return (
-        <ClassPassReturnLookup
-          onFound={handleSubmitClassPassReturning}
-          onBack={() => setStep('classpass_new_or_return')}
         />
       )
 
@@ -303,7 +268,7 @@ export default function CheckinPage() {
       )
 
     case 'classpass_confirm':
-      return <ClassPassConfirmation cpSession={cpSession} onDone={resetToSelector} isReturning={cpReturning} />
+      return <ClassPassConfirmation cpSession={cpSession} onDone={resetToSelector} />
 
     // ── Tanning flow ──────────────────────────────────────────────────────
     case 'tanning_age_check':
