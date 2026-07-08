@@ -49,18 +49,25 @@ export default function WaiverStep({
         <h2 className="text-xl font-bold text-primary">{heading}</h2>
         <p className="text-sm text-gray-600">{intro}</p>
 
-        <div
-          ref={scrollRef}
-          onScroll={handleScroll}
-          tabIndex={0}
-          aria-label="Waiver text — scroll to bottom to enable agreement"
-          className="h-72 overflow-y-scroll rounded-lg border border-gray-300 bg-white p-4"
-        >
-          <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-gray-800">{waiverText}</pre>
+        <div className="relative">
+          <div
+            ref={scrollRef}
+            onScroll={handleScroll}
+            tabIndex={0}
+            aria-label="Waiver text — scroll to bottom to enable agreement"
+            className="h-72 overflow-y-scroll rounded-lg border border-gray-300 bg-white p-4"
+          >
+            <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-gray-800">{waiverText}</pre>
+          </div>
+          {!hasScrolled && (
+            <div className="pointer-events-none absolute bottom-2 left-0 right-0 flex justify-center">
+              <span className="animate-bounce rounded-full bg-gray-700/70 px-3 py-1 text-lg text-white">↓</span>
+            </div>
+          )}
         </div>
 
         {!hasScrolled && (
-          <p className="text-center text-sm text-gray-500">↓ Scroll to the bottom to enable the agreement checkbox</p>
+          <p className="text-center text-sm text-gray-500">Scroll to the bottom to unlock the agreement</p>
         )}
 
         <label className={`flex items-center gap-3 text-base font-semibold ${!hasScrolled ? 'opacity-40' : ''}`}>

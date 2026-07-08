@@ -11,7 +11,7 @@ export default function FlowSelector({ onGuest, onClassPass, onTanning, onVendor
           className="flex items-center justify-center gap-3 rounded-2xl bg-accent py-6 text-xl font-bold text-white shadow-lg"
           onClick={onGuest}
         >
-          🏋️ Guest
+          🏋️ Guest / Membership
         </button>
         <button
           className="flex items-center justify-center gap-3 rounded-2xl bg-teal-600 py-6 text-xl font-bold text-white shadow-lg"

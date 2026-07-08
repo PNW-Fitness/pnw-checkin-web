@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { isValidEmail, isValidZip, isValidPhone } from '../../lib/validators'
 
-const VISIT_REASONS = ['Day/week pass workout', 'Interested in membership', 'ClassPass', 'Event/Promotion']
+const VISIT_REASONS = ['Day/week pass workout', 'Interested in membership', 'Staff Guest', 'Event/Promotion']
 
 const HOW_HEARD_OPTIONS = [
   { value: 'Search Engine', label: 'Search Engine', hasSpecify: false },
