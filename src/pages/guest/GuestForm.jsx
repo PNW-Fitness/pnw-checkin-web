@@ -35,12 +35,12 @@ function validate(form, isMinor) {
   if (!form.first_name.trim()) errors.first_name = 'Required'
   if (!form.last_name.trim()) errors.last_name = 'Required'
   if (!isValidZip(form.zip_code)) errors.zip_code = 'Enter a 5-digit zip code'
-  if (!isValidPhone(form.phone)) errors.phone = 'Enter a 10-digit phone number'
+  if (!isValidPhone(form.phone)) errors.phone = 'Enter a valid phone number'
   if (!isValidEmail(form.email)) errors.email = 'Enter a valid email address'
   if (!form.visit_reason) errors.visit_reason = 'Required'
   if (isMinor) {
     if (!form.guardian_name.trim()) errors.guardian_name = 'Required for minor guests'
-    if (!isValidPhone(form.guardian_phone)) errors.guardian_phone = 'Enter a 10-digit phone number'
+    if (!isValidPhone(form.guardian_phone)) errors.guardian_phone = 'Enter a valid phone number'
   }
   return errors
 }
@@ -116,7 +116,7 @@ export default function GuestForm({ guestSession, navigate, onBack }) {
               <input className={inputClass} type="text" inputMode="numeric" maxLength={5} autoComplete="off" value={form.zip_code} onChange={(e) => set('zip_code', e.target.value.replace(/\D/g, ''))} />
             </Field>
             <Field label="Phone *" error={errors.phone}>
-              <input className={inputClass} type="tel" placeholder="(253) 555-0123" autoComplete="off" value={form.phone} onChange={(e) => set('phone', e.target.value)} />
+              <input className={inputClass} type="tel" placeholder="(253) 555-0123 or +44 20 7946 0958" autoComplete="off" value={form.phone} onChange={(e) => set('phone', e.target.value)} />
             </Field>
             <Field label="Email *" error={errors.email}>
               <input className={inputClass} type="email" autoComplete="off" value={form.email} onChange={(e) => set('email', e.target.value)} />
@@ -138,7 +138,7 @@ export default function GuestForm({ guestSession, navigate, onBack }) {
                 <input className={inputClass} type="text" autoComplete="off" value={form.guardian_name} onChange={(e) => set('guardian_name', e.target.value)} />
               </Field>
               <Field label="Guardian Phone *" error={errors.guardian_phone}>
-                <input className={inputClass} type="tel" placeholder="(253) 555-0123" autoComplete="off" value={form.guardian_phone} onChange={(e) => set('guardian_phone', e.target.value)} />
+                <input className={inputClass} type="tel" placeholder="(253) 555-0123 or +44 20 7946 0958" autoComplete="off" value={form.guardian_phone} onChange={(e) => set('guardian_phone', e.target.value)} />
               </Field>
             </fieldset>
           )}

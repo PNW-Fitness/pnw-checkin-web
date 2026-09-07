@@ -11,7 +11,7 @@ function validate(form) {
   } else if (form.contact.includes('@')) {
     if (!isValidEmail(form.contact)) errors.contact = 'Enter a valid email address'
   } else if (!isValidPhone(form.contact)) {
-    errors.contact = 'Enter a 10-digit phone number or an email address'
+    errors.contact = 'Enter a valid phone number or email address'
   }
   if (!isValidZip(form.zipCode)) errors.zipCode = 'Enter a 5-digit zip code'
   return errors

@@ -8,7 +8,7 @@ export function computeAge(dob) {
 }
 
 export function normalizePhone(phone) {
-  return phone.replace(/\D/g, '').slice(-10)
+  return phone.replace(/\D/g, '')
 }
 
 export function isValidEmail(value) {
@@ -19,6 +19,10 @@ export function isValidZip(value) {
   return /^\d{5}$/.test(value.trim())
 }
 
+// Accepts US numbers as well as foreign numbers (with or without a leading
+// "+" country code prefix). Follows the E.164 length range (min 7, max 15
+// digits) rather than requiring exactly 10 US-style digits.
 export function isValidPhone(value) {
-  return normalizePhone(value).length === 10
+  const digits = normalizePhone(value)
+  return digits.length >= 7 && digits.length <= 15
 }
